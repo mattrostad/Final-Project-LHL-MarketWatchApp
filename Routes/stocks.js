@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const router = express.Router();
+const axios = require('axios');
 
 router.get('/', (req, res) => {
   // once we create a sign up form prob sigUp.ejs
@@ -116,7 +117,7 @@ router.get('/history/:symbol', async(req, res) => {
 });
 
 // Performance Comparisons (assumes watchlist comparison feature)
-router.get('/compare/:symbols', (req, res) => {
+router.get('/compare/:symbols', async(req, res) => {
   // Compare performance of stocks based on provided symbols and time frame
   try {
     const symbolList = req.params.symbols.split(','); // Split the symbols into an array
@@ -135,14 +136,14 @@ router.get('/compare/:symbols', (req, res) => {
     // Process and calculate performance metrics (e.g., compare stock prices)
 
     // Send the comparison results to the client
-    res.json({ comparisonData: /* Your comparison data here */ });
+    res.json({ comparisonData: "Our Comparison Data should be here" });
   } catch (error) {
     console.error(error);
     res.status(500).send('An error occurred while comparing stock performance.');
   }
 });
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+app.listen(8000, () => {
+  console.log('Server is running on port 8000');
 });
 module.exports = router;
