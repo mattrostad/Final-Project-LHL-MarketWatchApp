@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const router = express.Router();
 const axios = require('axios');
+const Watchlist = require('../models/Watchlist');
+
 
 router.get('/', (req, res) => {
   // once we create a sign up form prob sigUp.ejs
@@ -19,14 +21,12 @@ router.post('/', (req, res) => {
     date: new Date()})
 });
 
-const Watchlist = require('../models/Watchlist'); // Roy replace with whatever our watchlist route and file will be
-
 
 // Personalized Watchlist
 router.get('/watchlist', async(req, res) => {
   try {
-    // Fetch the user's watchlist data from the database (will need to replace with our fetching code)
-    const userWatchlist = await Watchlist.find({ userId: req.user.id }); // Authentication middleware might be needed, not sure
+    // Fetch the user's watchlist data from the database 
+    const userWatchlist = Watchlist.getUserWatchlist(req.user.id); // Authentication middleware might be needed, not sure
     
     // we should ender the watchlist view and pass the watchlist data to it
     res.render('watchlist', { watchlist: userWatchlist });
@@ -36,42 +36,42 @@ router.get('/watchlist', async(req, res) => {
   }
 });
 
-router.post('/watchlist/add', async(req, res) => {
+router.post('/watchlist/add', async (req, res) => {
   try {
     const { userId, stockSymbol } = req.body;
 
-    // Validate input
+    // Validate input (userId should be taken from the authenticated user)
     if (!userId || !stockSymbol) {
       return res.status(400).send('User ID and stock symbol are required.');
     }
 
-    // to create a new watchlist item and save it to the database
-    const newWatchlistItem = new Watchlist({
-      userId,
-      stockSymbol
-    });
-    await newWatchlistItem.save();
+    // Attempt to add the stock to the watchlist
+    const added = Watchlist.addToWatchlist(userId, stockSymbol);
 
-    res.status(201).send('Stock added to watchlist successfully.');
+    if (added) {
+      res.status(201).send('Stock added to watchlist successfully.');
+    } else {
+      res.status(400).send('Stock is already in the watchlist.');
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send('An error occurred while adding the stock to the watchlist.');
   }
-});
+})
 
-router.delete('/watchlist/:stockId', async(req, res) => {
-  // Handle removing a stock from the watchlist
+router.delete('/watchlist/:stockSymbol', async (req, res) => {
   try {
-    const stockId = req.params.stockId;
+    const userId = req.user.id; // Get the user ID from authentication
+    const stockSymbol = req.params.stockSymbol;
 
-    // Find the watchlist item by stockId and delete it
-    const deletedItem = await Watchlist.findByIdAndDelete(stockId);
+    // Attempt to remove the stock from the watchlist
+    const removed = Watchlist.removeFromWatchlist(userId, stockSymbol);
 
-    if (!deletedItem) {
-      return res.status(404).send('Watchlist item not found.');
+    if (removed) {
+      res.status(200).send('Stock removed from watchlist successfully.');
+    } else {
+      res.status(404).send('Stock not found in the watchlist.');
     }
-
-    res.status(200).send('Stock removed from watchlist successfully.');
   } catch (error) {
     console.error(error);
     res.status(500).send('An error occurred while removing the stock from the watchlist.');
@@ -83,7 +83,7 @@ router.get('/stocks/:symbol', async(req, res) => {
   // Fetch real-time stock data for a specific symbol and send it to the client
   try {
     const symbol = req.params.symbol;
-    const apiKey = 'your_api_key'; // Replace with our actual API key
+    const apiKey = 'our_api_key'; // Replace with our actual API key
     const apiUrl = `https://api.example.com/stocks/${symbol}?apiKey=${apiKey}`; // Replace with the actual API URL
 
     // Fetch real-time stock data from the external API
@@ -102,7 +102,7 @@ router.get('/history/:symbol', async(req, res) => {
   // Fetch historical stock data for a specific symbol and send it to the client
   try {
     const symbol = req.params.symbol;
-    const apiKey = 'your_api_key'; // Replace with our actual API key
+    const apiKey = 'our_api_key'; // Replace with our actual API key
     const apiUrl = `https://api.example.com/history/${symbol}?apiKey=${apiKey}`; // Replace with our actual API URL
 
     // Fetch historical stock data from the external API
@@ -121,7 +121,7 @@ router.get('/compare/:symbols', async(req, res) => {
   // Compare performance of stocks based on provided symbols and time frame
   try {
     const symbolList = req.params.symbols.split(','); // Split the symbols into an array
-    const apiKey = 'your_api_key'; // Replace with our API key
+    const apiKey = 'our_api_key'; // Replace with our API key
     const baseUrl = 'https://api.example.com/history'; // Replace with our API URL
 
     // Fetch historical data for each symbol
@@ -143,7 +143,7 @@ router.get('/compare/:symbols', async(req, res) => {
   }
 });
 
-app.listen(8000, () => {
-  console.log('Server is running on port 8000');
+app.listen(7001, () => {
+  console.log('Server is running on port 7001');
 });
 module.exports = router;

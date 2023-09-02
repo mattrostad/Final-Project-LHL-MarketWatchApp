@@ -86,7 +86,7 @@ router.get('/news/:symbol', async(req, res) => {
   // Fetch relevant news and analysis for a specific stock symbol and send it to the client
   try {
     const symbol = req.params.symbol;
-    const apiKey = 'your_api_key'; // Replace with our actual API key
+    const apiKey = 'our_api_key'; // Replace with our actual API key
     const apiUrl = `https://api.example.com/news/${symbol}?apiKey=${apiKey}`; // Replace with the actual API URL
 
     // Fetch news and analysis data from the external API
