@@ -1,5 +1,5 @@
 const express = require('express');
-const app = express();
+// const app = express();
 const router = express.Router();
 const axios = require('axios');
 const Watchlist = require('../models/Watchlist');
@@ -143,7 +143,7 @@ router.get('/compare/:symbols', async(req, res) => {
   }
 });
 
-app.listen(7001, () => {
-  console.log('Server is running on port 7001');
-});
+// app.listen(7001, () => {
+//   console.log('Server is running on port 7001');
+// });
 module.exports = router;

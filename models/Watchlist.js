@@ -1,7 +1,7 @@
 
 
 // Simulated database to store watchlist data
-const watchlistDatabase = [];
+const watchlistDatabase = [];//it needs to be the real datbase 
 
 // Function to add a stock to the watchlist
 function addToWatchlist(userId, stockSymbol) {

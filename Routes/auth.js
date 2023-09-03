@@ -6,7 +6,6 @@ const router = express.Router();
 const axios = require('axios')
 
 
-app.set('view engine', 'ejs'); // Set the view engine to EJS
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.session());
 
